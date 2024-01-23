@@ -12,6 +12,8 @@ import Vision
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     @IBOutlet weak var previewView: UIView!
 
+    let drawLayer = CALayer()
+
     var cameraDevice: CameraDevice?
 
     override func viewDidLoad() {
@@ -39,6 +41,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         DispatchQueue.main.async {
             self.previewView.layer.addSublayer(previewLayer)
             previewLayer.frame = self.previewView.bounds
+            self.previewView.layer.addSublayer(self.drawLayer)
+            self.drawLayer.frame = self.previewView.bounds
         }
 
         cameraDevice = CameraDevice(preview: previewLayer, cameraBufferDataDelegate: self)
@@ -79,13 +83,37 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             }
 
             print("bestObservation box : \(String(describing: bestObservation.boundingBox))")
-            //TODO draw rect
+            DispatchQueue.main.async {
+                self.drawBoundingBox(bestObservation.boundingBox)
+            }
         }
         do {
             try handler.perform([request])
         } catch {
             print("error while perform request")
         }
+    }
+
+    func drawBoundingBox(_ box: CGRect) {
+        let layerWidth = drawLayer.bounds.width
+        let layerHeight = drawLayer.bounds.height
+        let boundingBox = CGRect(
+            x: (1.0 - box.origin.x - box.width) * layerWidth,
+            y: (1.0 - box.origin.y - box.height) * layerHeight,
+            width: box.width * layerWidth,
+            height: box.height * layerHeight
+        )
+        let boundingBoxLayer = getBoundingBoxLayer(boundingBox)
+        drawLayer.sublayers = nil
+        drawLayer.addSublayer(boundingBoxLayer)
+    }
+
+    func getBoundingBoxLayer(_ rect: CGRect) -> CALayer {
+        let boxLayer = CALayer()
+        boxLayer.frame = rect
+        boxLayer.borderWidth = 3.0
+        boxLayer.borderColor = UIColor.red.cgColor
+        return boxLayer
     }
 }
 
