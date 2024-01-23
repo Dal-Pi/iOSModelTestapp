@@ -14,6 +14,7 @@
 		A82746172B5A3F4100F11277 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A82746152B5A3F4100F11277 /* Main.storyboard */; };
 		A82746192B5A3F4500F11277 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A82746182B5A3F4500F11277 /* Assets.xcassets */; };
 		A827461C2B5A3F4500F11277 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A827461A2B5A3F4500F11277 /* LaunchScreen.storyboard */; };
+		A8D4BF8C2B63419C00ACC127 /* YOLOv3Tiny.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A8D4BF8B2B63419B00ACC127 /* YOLOv3Tiny.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		A82746182B5A3F4500F11277 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A827461B2B5A3F4500F11277 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A827461D2B5A3F4500F11277 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A8D4BF8B2B63419B00ACC127 /* YOLOv3Tiny.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = YOLOv3Tiny.mlmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				A827461A2B5A3F4500F11277 /* LaunchScreen.storyboard */,
 				A827461D2B5A3F4500F11277 /* Info.plist */,
 				A802D2952B5EC8C700D2685F /* CameraDevice.swift */,
+				A8D4BF8B2B63419B00ACC127 /* YOLOv3Tiny.mlmodel */,
 			);
 			path = iOSModelTestapp;
 			sourceTree = "<group>";
@@ -143,6 +146,7 @@
 			files = (
 				A82746142B5A3F4100F11277 /* ViewController.swift in Sources */,
 				A82746102B5A3F4100F11277 /* AppDelegate.swift in Sources */,
+				A8D4BF8C2B63419C00ACC127 /* YOLOv3Tiny.mlmodel in Sources */,
 				A802D2962B5EC8C700D2685F /* CameraDevice.swift in Sources */,
 				A82746122B5A3F4100F11277 /* SceneDelegate.swift in Sources */,
 			);

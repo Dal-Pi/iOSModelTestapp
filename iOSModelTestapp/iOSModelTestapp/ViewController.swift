@@ -16,6 +16,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     var cameraDevice: CameraDevice?
 
+    var _model: VNCoreMLModel? = nil
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -49,7 +51,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
         DispatchQueue.global().async {
             do {
-                try self.cameraDevice?.openCamera(cameraType: .builtInWideAngleCamera, position: .front)
+                try self.cameraDevice?.openCamera(cameraType: .builtInWideAngleCamera, position: .back)
             } catch {
                 print("error while opening camera")
             }
@@ -68,9 +70,21 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
 
     func analyzeImage(image: CIImage) {
+        do {
+            if _model == nil {
+                _model = try VNCoreMLModel(for: YOLOv3Tiny(configuration: MLModelConfiguration()).model)
+            }
+        } catch {
+            print("cannot load mlmodel")
+        }
+        guard let model = _model else {
+            print("there is no model")
+            return
+        }
+
         let handler = VNImageRequestHandler(ciImage: image, orientation: .up)
-        let request = VNDetectFaceRectanglesRequest { requested, error in
-            guard let observations = requested.results as? [VNFaceObservation] else {
+        let request = VNCoreMLRequest(model: model) { requested, error in
+            guard let observations = requested.results as? [VNRecognizedObjectObservation] else {
                 print("there is no observations")
                 return
             }
@@ -84,7 +98,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             print("bestObservation box : \(String(describing: bestObservation.boundingBox))")
             DispatchQueue.main.async {
-                self.drawBoundingBox(bestObservation.boundingBox)
+                self.drawBoundingBox(bestObservation.boundingBox, bestObservation.labels.first?.identifier ?? "unknown")
             }
         }
         do {
@@ -94,25 +108,28 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         }
     }
 
-    func drawBoundingBox(_ box: CGRect) {
+    func drawBoundingBox(_ box: CGRect, _ label: String) {
         let layerWidth = drawLayer.bounds.width
         let layerHeight = drawLayer.bounds.height
         let boundingBox = CGRect(
-            x: (1.0 - box.origin.x - box.width) * layerWidth,
+            x: box.origin.x * layerWidth,
             y: (1.0 - box.origin.y - box.height) * layerHeight,
             width: box.width * layerWidth,
             height: box.height * layerHeight
         )
-        let boundingBoxLayer = getBoundingBoxLayer(boundingBox)
+        let boundingBoxLayer = getBoundingBoxLayer(boundingBox, label)
         drawLayer.sublayers = nil
         drawLayer.addSublayer(boundingBoxLayer)
     }
 
-    func getBoundingBoxLayer(_ rect: CGRect) -> CALayer {
-        let boxLayer = CALayer()
+    func getBoundingBoxLayer(_ rect: CGRect, _ label: String) -> CALayer {
+        let boxLayer = CATextLayer()
         boxLayer.frame = rect
         boxLayer.borderWidth = 3.0
         boxLayer.borderColor = UIColor.red.cgColor
+        boxLayer.fontSize = 16
+        boxLayer.foregroundColor = UIColor.red.cgColor
+        boxLayer.string = label
         return boxLayer
     }
 }
